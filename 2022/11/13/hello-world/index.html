@@ -24,7 +24,7 @@
 
   
 
-  <title>Hello World | 理想国与乌托邦</title>
+  <title>ERC20 合约简介 | 理想国与乌托邦</title>
 
   
 
@@ -100,7 +100,7 @@
     <div class="header-content">
       <div class="post-text layout-block">
         <div class="layout-margin">
-          <h1 class="title-wrap">Hello World</h1>
+          <h1 class="title-wrap">ERC20 合约简介</h1>
           <h2 class="title-sub-wrap">
             <strong>Leo Su</strong>
             <span>发布于</span>
@@ -134,19 +134,13 @@
       
       <section class="article-entry markdown-body layout-margin content-padding--large soft-size--large soft-style--box">
         <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
+<h2 id="智能合约中使用的ERC-20标准仅包含6个基本功能，这些功能使令牌成为可靠的功能。代码非常简单，您无需掌握任何计算机科学知识即可理解它。让我们一块一块地完成它。"><a href="#智能合约中使用的ERC-20标准仅包含6个基本功能，这些功能使令牌成为可靠的功能。代码非常简单，您无需掌握任何计算机科学知识即可理解它。让我们一块一块地完成它。" class="headerlink" title="智能合约中使用的ERC-20标准仅包含6个基本功能，这些功能使令牌成为可靠的功能。代码非常简单，您无需掌握任何计算机科学知识即可理解它。让我们一块一块地完成它。"></a>智能合约中使用的ERC-20标准仅包含6个基本功能，这些功能使令牌成为可靠的功能。代码非常简单，您无需掌握任何计算机科学知识即可理解它。让我们一块一块地完成它。</h2><h3 id="1-totalSupply（）函数"><a href="#1-totalSupply（）函数" class="headerlink" title="1. totalSupply（）函数"></a>1. totalSupply（）函数</h3><p>它确定在给定项目的TOKEN经济中将要创建的令牌总数。</p>
+<h3 id="2-transfer（）函数"><a href="#2-transfer（）函数" class="headerlink" title="2. transfer（）函数"></a>2. transfer（）函数</h3><p>用于将令牌初始分配给用户钱包。这个功能是ERC-20令牌在ICO中如此受欢迎的最大原因，因为它使ICO完成时向投资者发送令牌非常容易。</p>
+<h3 id="3-transferFrom（）函数"><a href="#3-transferFrom（）函数" class="headerlink" title="3. transferFrom（）函数"></a>3. transferFrom（）函数</h3><p>使得令牌持有者的初始分布后彼此交换令牌。假设您要向朋友发送一些BAT，此功能将获取您的以太坊钱包地址，收件人的以太坊钱包地址以及发送的金额，然后执行交易</p>
+<h3 id="4-balanceOf（）函数"><a href="#4-balanceOf（）函数" class="headerlink" title="4. balanceOf（）函数"></a>4. balanceOf（）函数</h3><p>跟踪每个用户钱包中的令牌余额。很简单。</p>
+<h3 id="5-approve-函数"><a href="#5-approve-函数" class="headerlink" title="5. approve()函数"></a>5. approve()函数</h3><p>用于保证经济中的总游戏币供给保持不变。换句话说，这个TOKEN产量已经固定，以确保没有人能够凭空创造额外的令牌以使自己受益。</p>
+<h3 id="6-allowance（）函数"><a href="#6-allowance（）函数" class="headerlink" title="6. allowance（）函数"></a>6. allowance（）函数</h3><p>确保事务在添加到区块链之前有效。每当用户想要将某些令牌转移到另一个钱包时，此功能会检查发送地址是否至少具有与transferFrom（）函数中规定的数量一样多的令牌。如果没有，则交易无效。</p>
+<h2 id="通过这6个功能，创建新的令牌以及为它们开发平台和钱包非常简单。该标准已被数百万个不同的项目所采用。事实上，前20个以太坊令牌中的所有项目都是ERC-20令牌。"><a href="#通过这6个功能，创建新的令牌以及为它们开发平台和钱包非常简单。该标准已被数百万个不同的项目所采用。事实上，前20个以太坊令牌中的所有项目都是ERC-20令牌。" class="headerlink" title="通过这6个功能，创建新的令牌以及为它们开发平台和钱包非常简单。该标准已被数百万个不同的项目所采用。事实上，前20个以太坊令牌中的所有项目都是ERC-20令牌。"></a>通过这6个功能，创建新的令牌以及为它们开发平台和钱包非常简单。该标准已被数百万个不同的项目所采用。事实上，前20个以太坊令牌中的所有项目都是ERC-20令牌。</h2>
       </section>
 
       
