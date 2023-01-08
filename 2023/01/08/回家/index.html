@@ -24,7 +24,7 @@
 
   
 
-  <title>使用 OKX API 接口获取价格信息 | 理想国与乌托邦</title>
+  <title>回家随笔 | 理想国与乌托邦</title>
 
   
 
@@ -100,11 +100,11 @@
     <div class="header-content">
       <div class="post-text layout-block">
         <div class="layout-margin">
-          <h1 class="title-wrap">使用 OKX API 接口获取价格信息</h1>
+          <h1 class="title-wrap">回家随笔</h1>
           <h2 class="title-sub-wrap">
             <strong>Leo Su</strong>
             <span>发布于</span>
-            <time  class="article-date" datetime="2022-12-20T03:39:09.402Z" itemprop="datePublished">2022-12-20</time>
+            <time  class="article-date" datetime="2023-01-08T07:03:26.343Z" itemprop="datePublished">2023-01-08</time>
           </h2>
           <ul class="wrap-list dark">
   
@@ -133,36 +133,36 @@
       
       
       <section class="article-entry markdown-body layout-margin content-padding--large soft-size--large soft-style--box">
-        <h3 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a>效果图</h3><p><img src="/pic/api_okx.png" alt="img"></p>
-<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import pandas as pd</span><br><span class="line">from datetime import datetime</span><br><span class="line"></span><br><span class="line">def get_single_tricker_data(symbol):</span><br><span class="line"></span><br><span class="line">    ticker_url = f&#x27;https://www.okx.com/api/v5/market/ticker?instId=&#123;symbol&#125;-SWAP&#x27;</span><br><span class="line">    response_object  = requests.get(ticker_url)</span><br><span class="line"></span><br><span class="line">    json_object = response_object.json()</span><br><span class="line">    raw_df = pd.DataFrame(json_object)</span><br><span class="line"></span><br><span class="line">    raw_df = pd.json_normalize(json_object,record_path=[&#x27;data&#x27;])  # 将内嵌的数据完整的解析出来</span><br><span class="line"></span><br><span class="line">    ticker_df = pd.DataFrame(index=[0],columns=[&#x27;datetime&#x27;,&#x27;symbol&#x27;,&#x27;last&#x27;])</span><br><span class="line">    ticker_df[&#x27;datetime&#x27;] = pd.to_datetime(datetime.utcnow())</span><br><span class="line">    ticker_df[&#x27;symbol&#x27;] = symbol.replace(&#x27;-&#x27;,&#x27;/&#x27;).lower()</span><br><span class="line">    ticker_df[&#x27;last&#x27;] = raw_df[&#x27;last&#x27;]</span><br><span class="line"></span><br><span class="line">    return ticker_df</span><br><span class="line"></span><br><span class="line">def get_tickers_data(symbols):</span><br><span class="line"></span><br><span class="line">    tickers_df = pd.DataFrame()</span><br><span class="line">    for symbol in symbols:</span><br><span class="line">        ticker_df = get_single_tricker_data(symbol)</span><br><span class="line">        tickers_df = tickers_df.append(ticker_df)</span><br><span class="line"></span><br><span class="line">    return tickers_df</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line"></span><br><span class="line">    # symbol = &#x27;BTC-USDT-SWAP&#x27;</span><br><span class="line">    # tricker_df = get_single_tricker_data(symbol)</span><br><span class="line">    # print(tricker_df)</span><br><span class="line"></span><br><span class="line">    symbols = [&#x27;BTC-USDT&#x27;,&#x27;ETH-USDT&#x27;,&#x27;YGG-USDT&#x27;,&#x27;1INCH-USDT&#x27;,&#x27;DYDX-USDT&#x27;,&#x27;CRV-USDT&#x27;,</span><br><span class="line">                &#x27;UNI-USDT&#x27;,&#x27;ENS-USDT&#x27;</span><br><span class="line">            ]</span><br><span class="line">    tickers_df = get_tickers_data(symbols)</span><br><span class="line">    print(tickers_df)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    main() </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+        <p>年底了，朋友们陆陆续续都准备或者已经回家了。</p>
+<p>我曾问父亲什么是家，他和我说601就是你的家</p>
+<p>后来懂了，吾心安处即是家</p>
+<hr>
+<p>我在高中时曾经和一个女孩子说，你不要喜欢我，我并不能给你幸福。</p>
+<p>她说只要现在不想考虑那么久。  “现在并不代表以后，未来谁也不知道”</p>
+<p>现在她的女儿已经会打酱油了，过的快快乐乐</p>
+<p>很高兴10年过去她能有一个幸福的家庭</p>
+<p>在高中最黑暗的时光，她散发着微弱但坚韧的光，照亮着我</p>
+<hr>
+<p>星和我说，你不要觉得女孩子和你谈恋爱就是要和你结婚成家，这样女方的压力也会很大，你也会错过很多机会</p>
+<p>虽然星在其它方面笨笨的，但这点好像挺聪明，一下就看出了我最真实的想法</p>
+<hr>
+<p>身为一个历史唯物论与辩证唯物论的信徒，只希望如果上帝存在能让我完成救赎</p>
+<p>god bless me</p>
+
       </section>
 
       
       
         <nav class="article-nav">
           
-            <div class="article-nav-item layout-padding">
-  <article class="card-container article-nav-card content-padding--primary soft-size--large soft-style--box">
-    
-    <div class="card-text">
-      
-        <a href="/2022/12/21/brownie/" itemprop="url">
-          <h2 class="card-text--title text-ellipsis">智能合约的开发环境</h2>
-        </a>
-      
-      <div class="card-text--row">Newer</div>
-    </div>
-  </article>
-</div>
-          
           
             <div class="article-nav-item layout-padding">
   <article class="card-container article-nav-card content-padding--primary soft-size--large soft-style--box">
     
     <div class="card-text">
       
-        <a href="/2022/12/19/%E5%8D%A1%E5%A1%94%E5%B0%94%E4%B8%96%E7%95%8C%E6%9D%AF/" itemprop="url">
-          <h2 class="card-text--title text-ellipsis">2022世界杯</h2>
+        <a href="/2022/12/30/%E5%B9%B4%E5%BA%95%E6%80%BB%E7%BB%93/" itemprop="url">
+          <h2 class="card-text--title text-ellipsis">2022年总结</h2>
         </a>
       
       <div class="card-text--row">Older</div>
