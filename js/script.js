@@ -3,6 +3,11 @@ window.addEventListener("DOMContentLoaded", function() {
   const navBtn          = document.querySelector(".navbar-btn");
   const navList         = document.querySelector(".navbar-list");
   const backToTopFixed  = document.querySelector(".back-to-top-fixed");
+  const walletBtn       = document.querySelector("[data-wallet-connect]");
+  const walletPanel     = document.querySelector("[data-wallet-panel]");
+  const walletCopyBtn   = document.querySelector("[data-wallet-copy]");
+  const walletDisBtn    = document.querySelector("[data-wallet-disconnect]");
+  const walletHint      = document.querySelector("[data-wallet-comment-hint]");
   let lastTop           = 0;
   let theme             = window.localStorage.getItem('theme') || '';
 
@@ -77,6 +82,16 @@ window.addEventListener("DOMContentLoaded", function() {
 
   /** handle lazy bg iamge */
   handleLazyBG();
+
+  if (walletBtn) {
+    initWalletButton({
+      button: walletBtn,
+      panel: walletPanel,
+      copyBtn: walletCopyBtn,
+      disconnectBtn: walletDisBtn,
+      hint: walletHint
+    })
+  }
 });
 
 /**
@@ -117,4 +132,203 @@ function handleLazyBG () {
       lazyBackgroundObserver.observe(lazyBackground)
     })
   }
+}
+
+function initWalletButton ({ button, panel, copyBtn, disconnectBtn, hint }) {
+  const provider = window.ethereum
+  const disconnectFlagKey = "wallet-disconnected"
+  const setDisconnected = () => {
+    button.textContent = "连接钱包"
+    button.dataset.walletConnected = "false"
+    button.removeAttribute("title")
+    button.dataset.walletAddress = ""
+    button.dataset.walletEns = ""
+    panel && panel.classList.remove("show")
+  }
+  const formatAddress = (address) => {
+    if (!address) return ""
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
+  }
+  const setConnected = (address, ensName) => {
+    button.textContent = ensName || formatAddress(address)
+    button.dataset.walletConnected = "true"
+    button.title = address
+    button.dataset.walletAddress = address
+    button.dataset.walletEns = ensName || ""
+  }
+  const togglePanel = () => {
+    if (!panel) return
+    panel.classList.toggle("show")
+  }
+  const closePanel = () => {
+    if (!panel) return
+    panel.classList.remove("show")
+  }
+  const getConnectedAddress = () => button.dataset.walletAddress || button.title || ""
+  const getConnectedEns = () => button.dataset.walletEns || ""
+  const shouldStayDisconnected = () => window.sessionStorage.getItem(disconnectFlagKey) === "1"
+  const clearDisconnectFlag = () => window.sessionStorage.removeItem(disconnectFlagKey)
+  const canResolveEns = () => !!(window.ethers && window.ethers.BrowserProvider)
+  const resolveEns = async (address) => {
+    if (!canResolveEns()) return ""
+    try {
+      const provider = new window.ethers.BrowserProvider(window.ethereum)
+      const network = await provider.getNetwork()
+      const chainId = typeof network.chainId === "bigint" ? Number(network.chainId) : network.chainId
+      if (chainId !== 1) return ""
+      const ensName = await provider.lookupAddress(address)
+      return ensName || ""
+    } catch (error) {
+      return ""
+    }
+  }
+
+  if (!provider || !provider.request) {
+    button.addEventListener("click", function () {
+      alert("未检测到钱包扩展（如 MetaMask）。")
+    })
+    return
+  }
+
+  const updateCommentIdentity = () => {
+    const input = document.querySelector('input[name="nick"], input.vnick')
+    if (!input) return
+    const ensName = getConnectedEns()
+    const address = getConnectedAddress()
+    if (ensName || address) {
+      input.value = ensName || address
+      input.placeholder = "已使用钱包昵称"
+      if (hint) hint.textContent = "已连接钱包，将使用钱包昵称显示（可手动修改）。"
+    } else {
+      input.placeholder = "未连接钱包，使用默认昵称"
+      if (hint) hint.textContent = "未连接钱包时，请使用默认昵称留言。"
+    }
+  }
+
+  const waitForCommentInput = () => {
+    let tries = 0
+    const timer = setInterval(() => {
+      tries += 1
+      if (document.querySelector('input[name="nick"], input.vnick')) {
+        clearInterval(timer)
+        updateCommentIdentity()
+      }
+      if (tries >= 20) {
+        clearInterval(timer)
+      }
+    }, 300)
+  }
+
+  button.addEventListener("click", async function () {
+    if (button.dataset.walletConnected === "true") {
+      togglePanel()
+      return
+    }
+
+    button.disabled = true
+    button.textContent = "连接中..."
+    try {
+      const accounts = await provider.request({ method: "eth_requestAccounts" })
+      if (accounts && accounts.length > 0) {
+        const address = accounts[0]
+        clearDisconnectFlag()
+        setConnected(address)
+        const ensName = await resolveEns(address)
+        if (ensName) setConnected(address, ensName)
+        closePanel()
+        updateCommentIdentity()
+      } else {
+        setDisconnected()
+        updateCommentIdentity()
+      }
+    } catch (error) {
+      setDisconnected()
+      updateCommentIdentity()
+    } finally {
+      button.disabled = false
+    }
+  })
+
+  if (!shouldStayDisconnected()) {
+    provider.request({ method: "eth_accounts" })
+      .then(async (accounts) => {
+        if (accounts && accounts.length > 0) {
+          const address = accounts[0]
+          setConnected(address)
+          const ensName = await resolveEns(address)
+          if (ensName) setConnected(address, ensName)
+          updateCommentIdentity()
+        } else {
+          setDisconnected()
+          updateCommentIdentity()
+        }
+      })
+      .catch(() => {
+        setDisconnected()
+        updateCommentIdentity()
+      })
+  } else {
+    setDisconnected()
+    updateCommentIdentity()
+  }
+
+  if (copyBtn) {
+    copyBtn.addEventListener("click", async function () {
+      const address = getConnectedAddress()
+      if (!address) return
+      try {
+        await navigator.clipboard.writeText(address)
+        copyBtn.textContent = "已复制"
+        setTimeout(() => {
+          copyBtn.textContent = "复制地址"
+        }, 1200)
+      } catch (error) {
+        alert("复制失败，请手动复制。")
+      }
+      closePanel()
+    })
+  }
+
+  if (disconnectBtn) {
+    disconnectBtn.addEventListener("click", function () {
+      window.sessionStorage.setItem(disconnectFlagKey, "1")
+      setDisconnected()
+      updateCommentIdentity()
+      closePanel()
+    })
+  }
+
+  document.addEventListener("click", function (event) {
+    if (!panel || !panel.classList.contains("show")) return
+    const target = event.target
+    const isInside = target && (panel.contains(target) || button.contains(target))
+    if (!isInside) closePanel()
+  })
+
+  if (provider.on) {
+    provider.on("accountsChanged", (accounts) => {
+      if (shouldStayDisconnected()) {
+        setDisconnected()
+        updateCommentIdentity()
+        return
+      }
+      if (accounts && accounts.length > 0) {
+        const address = accounts[0]
+        setConnected(address)
+        resolveEns(address).then((ensName) => {
+          if (ensName) setConnected(address, ensName)
+          updateCommentIdentity()
+        })
+      } else {
+        setDisconnected()
+        updateCommentIdentity()
+      }
+    })
+    provider.on("disconnect", () => {
+      setDisconnected()
+      updateCommentIdentity()
+    })
+  }
+
+  waitForCommentInput()
 }
